@@ -115,6 +115,32 @@ assert b.toAddress(wallet.getParams()).equals(a);
 assert !c.equals(a);
 
 // https://bitcoinj.github.io/working-with-the-wallet
+DeterministicSeed seed = wallet.getKeyChainSeed();
+println("Seed words are: " + Joiner.on(" ").join(seed.getMnemonicCode()));
+println("Seed birthday is: " + seed.getCreationTimeSeconds());
+
+String seedCode = "yard impulse luxury drive today throw farm pepper survery wreck glass federal";
+long creationtime = 1409478661L;
+DeterministicSeed seed = new DeterministicSeed(seedCode, null, "", creationtime);
+Wallet restoredWallet = Wallet.fromSeed(params, seed);
+
+System.out.println("You have " + Coin.FRIENDY_FORMAT.format(wallet.getBalance()));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ```
 
 
