@@ -126,21 +126,61 @@ Wallet restoredWallet = Wallet.fromSeed(params, seed);
 
 System.out.println("You have " + Coin.FRIENDY_FORMAT.format(wallet.getBalance()));
 
+Address targetAddress = new Address(params, "xxx");
+Wallet.SendResult result = wallet.sendCoins(peerGroup, targetAddress, Coin.COIN);
+wallet.saveToFile(...);
+result.broadcastComplete.get();
 
+SendRequest request = SendRequest.to(address, value);
 
+wallet.completeTx(request);
+wallet.commitTx(request.tx);
+wallet.saveToFile(...);
 
+ListenableFuture<Transaction> future = peerGroup.broadcastTransaction(request.tx);
 
+future.get();
 
+Address target1 = new Address(params, "xxx");
+Address target2 = new Address(params, "xxx");
+Transaction tx = new Transaction(params);
+tx.addOutput(Utils.toNanoCoins(1, 10), target1);
+tx.addOutput(Utils.toNanoCoins(2, 20), target2);
+SendReques request = SendRequest.forTx(tx);
+if (!wallet.completeTx(request)) {
+  //
+} else {
+  wallet.commitTx(request.tx);
+  peerGroup.broadcastTransaction(request.tx).get();
+}
 
+Address a = new Address(params, "xxx");
+SendRequest req = SendRequest.to(a, Coin.parseCoin("0.12"));
+req.aesKey = wallet.getKeyCrypter().deriveKey("password");
+wallet.sendCoins(req);
 
+Wallet toWatch = ...;
+DeterministicKey watchingKey = toWatch.getWatchingKey();
 
+System.out.println("Watching key data: " + watchingKey.serializePubB68());
+System.out.println("Watching key birthday: " + watchingKey.getCreationTimeSeconds());
 
+DeterministicKey key = DeterministicKey.deserializeB58(null, "key data goes here");
+long keyBirthday = 12345678L;
+Wallet watchingWallet = Wallet.fromWatchingKey(params, key, keyBirthday);
 
+wallet.addWatchedAddress(...);
+wallet.addWatchedScripts(List.of(script, script, script));
 
+DeterministicKey spousekey = ...;
+wallet.addFollowingAccountKeys(Lists.newArrayList(spouseKey), 2);
 
+Address a = wallet.freshReceiveAddress();
+assert a.isP2SHAddress();
 
-
-
+public interface UTXOProvider {
+  List<UTXO> getOpenTransactionOutputs(List<Address> addresses) throws UTXOProviderException;
+}
 ```
 
 
